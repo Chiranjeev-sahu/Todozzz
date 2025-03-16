@@ -158,7 +158,7 @@
         />
         <img
           id="addButton"
-          src="add-button-svgrepo-com.svg"
+          src="/icons/add-button-svgrepo-com.svg"
           alt="Add Task"
           class="icon-button"
         />
@@ -266,14 +266,14 @@
           
           // Create toggle button
           const toggleButton = document.createElement("img");
-          toggleButton.src = todo.done ? "check-double-svgrepo-com.svg" : "check-svgrepo-com.svg";
+          toggleButton.src = todo.done ? "/icons/check-double-svgrepo-com.svg":"/icons/check-svgrepo-com.svg";
           toggleButton.alt = todo.done ? "Mark Incomplete" : "Mark Complete";
           toggleButton.className = "icon-button";
           toggleButton.addEventListener("click", () => this.toggleTodo(todo.id));
           
           // Create delete button
           const deleteButton = document.createElement("img");
-          deleteButton.src = "delete-svgrepo-com.svg";
+          deleteButton.src = "/icons/delete-svgrepo-com.svg";
           deleteButton.alt = "Delete";
           deleteButton.className = "icon-button";
           deleteButton.addEventListener("click", () => this.deleteTodo(todo.id));
