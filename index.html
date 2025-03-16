@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TodoApp</title>
     <style>
-      /* Base styles */
       body {
         display: flex;
         justify-content: center;
@@ -14,7 +13,6 @@
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       }
       
-      /* Container styles */
       .todo-container {
         width: 600px;
         min-height: 100px;
@@ -27,14 +25,11 @@
         box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
       }
       
-      /* Header styles */
       .app-header {
         text-align: center;
         margin-bottom: 20px;
         color: #333;
       }
-      
-      /* Input area styles */
       .input-area {
         display: flex;
         align-items: center;
@@ -63,7 +58,6 @@
         transform: scale(1.1);
       }
       
-      /* Task list styles */
       .task-list {
         display: flex;
         flex-direction: column;
@@ -123,7 +117,6 @@
         color: #888;
       }
       
-      /* Empty state */
       .empty-state {
         text-align: center;
         color: #888;
@@ -131,7 +124,6 @@
         padding: 20px;
       }
       
-      /* Animation for new tasks */
       @keyframes fadeIn {
         from { opacity: 0; transform: translateY(-10px); }
         to { opacity: 1; transform: translateY(0); }
@@ -170,34 +162,21 @@
     </div>
 
     <script>
-      // Main app code
       const TodoApp = {
-        // App state
         todos: [],
         
-        // DOM elements
         elements: {
           taskInput: document.getElementById("taskInput"),
           addButton: document.getElementById("addButton"),
           taskList: document.getElementById("taskList")
         },
         
-        // Initialize the app
         init() {
-          // Set up event listeners
           this.elements.addButton.addEventListener("click", () => this.addTodo());
-          this.elements.taskInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") this.addTodo();
-          });
-          
-          // Load saved todos
           this.loadTodos();
-          
-          // Render initial state
           this.render();
         },
         
-        // Add a new todo
         addTodo() {
           const taskText = this.elements.taskInput.value.trim();
           
@@ -206,7 +185,6 @@
             return;
           }
           
-          // Create new todo object
           const newTodo = {
             id: Date.now(),
             title: taskText,
@@ -233,7 +211,7 @@
           this.render();
         },
         
-        // Toggle todo completion status
+        //Toggle todo completion status
         toggleTodo(id) {
           this.todos = this.todos.map(todo => {
             if (todo.id === id) {
@@ -246,7 +224,7 @@
           this.render();
         },
         
-        // Create a task element
+        //Create a task element
         createTaskElement(todo) {
           const taskItem = document.createElement("div");
           taskItem.className = `task-item ${todo.done ? "done" : ""} new-task`;
