@@ -3,112 +3,159 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Todozzz</title>
+    <title>TodoApp</title>
     <style>
+      /* Base styles */
       body {
         display: flex;
         justify-content: center;
-        padding-top: 263px;
-        background-color: #e0f7fa; /* Light blue */
+        padding-top: 100px;
+        background-color: #e0f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       }
+      
+      /* Container styles */
       .todo-container {
         width: 600px;
         min-height: 100px;
-        flex-direction: column;
         border: 1px solid #ccc;
         border-radius: 20px;
-        padding: 15px;
+        padding: 25px;
         background-color: #f9f9f9;
         display: flex;
-        justify-content: center;
-        box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.2);
+        flex-direction: column;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
       }
-
+      
+      /* Header styles */
+      .app-header {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+      }
+      
+      /* Input area styles */
       .input-area {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 50px;
-        margin-bottom: 15px;
+        justify-content: space-between;
+        margin-bottom: 25px;
       }
-
+      
       #taskInput {
         padding: 12px;
-        border: 1px solid #b3acac;
+        border: 1px solid #ddd;
         border-radius: 10px;
-        margin-top: 20px;
-        height: 15%;
-        width: 55%;
-        box-shadow: 4px 4px 1px rgba(206, 202, 202, 0.2);
+        flex-grow: 1;
+        margin-right: 15px;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
       }
-
+      
       #addButton {
-        margin-top: 18px;
-
         cursor: pointer;
-        width: 12%;
+        width: 40px;
+        height: 40px;
+        transition: transform 0.2s;
       }
-      #taskList {
+      
+      #addButton:hover {
+        transform: scale(1.1);
+      }
+      
+      /* Task list styles */
+      .task-list {
         display: flex;
-        justify-content: center;
-        align-items: center;
         flex-direction: column;
+        gap: 10px;
       }
+      
       .task-item {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 10px;
-        padding: 8px 12px;
-        border-bottom: 1px dashed #958f8f;
-        height: 15%;
-        width: 75%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        background-color: white;
+        border-left: 4px solid #4caf50;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
       }
-
+      
       .task-name {
         flex: 1;
         text-align: left;
         overflow: hidden;
         text-overflow: ellipsis;
       }
-
-      .task-name h1 {
+      
+      .task-name h3 {
         margin: 0;
         font-size: 18px;
-        font-weight: normal;
+        font-weight: 500;
       }
-
+      
       .actions {
         display: flex;
         align-items: center;
         gap: 15px;
-        min-width: 80px;
-        justify-content: flex-end;
       }
-
-      .mark-done-icon,
-      .delete-icon {
+      
+      .icon-button {
         width: 24px;
         height: 24px;
         cursor: pointer;
+        transition: transform 0.2s;
       }
-
-      #delimg {
-        cursor: pointer;
+      
+      .icon-button:hover {
+        transform: scale(1.2);
       }
-
+      
       /* Completed task styles */
-      .done .task-name h1 {
+      .done {
+        border-left: 4px solid #9e9e9e;
+        background-color: #f9f9f9;
+      }
+      
+      .done .task-name h3 {
         text-decoration: line-through;
         color: #888;
+      }
+      
+      /* Empty state */
+      .empty-state {
+        text-align: center;
+        color: #888;
+        font-style: italic;
+        padding: 20px;
+      }
+      
+      /* Animation for new tasks */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .new-task {
+        animation: fadeIn 0.3s ease-in-out;
       }
     </style>
   </head>
 
   <body>
     <div class="todo-container">
+      <div class="app-header">
+        <h1>Todo List</h1>
+      </div>
+      
       <div class="input-area">
-        <input type="text" id="taskInput" placeholder="Enter tasks" />
+        <input 
+          type="text" 
+          id="taskInput" 
+          placeholder="What needs to be done?" 
+          autofocus
+        />
         <img
           id="addButton"
           src="add-button-svgrepo-com.svg"
@@ -116,89 +163,181 @@
           class="icon-button"
         />
       </div>
-      <div class="task-list" id="taskList"></div>
+      
+      <div class="task-list" id="taskList">
+        <!-- Tasks will be added here -->
+      </div>
     </div>
 
     <script>
-      const button = document.getElementById("addButton");
-      button.addEventListener("click", addTodo);
-      let todos = [];
-      function addTodo() {
-        const taskInput = document.getElementById("taskInput").value.trim();
-
-        if (!taskInput) {
-          alert("Please enter a task before adding!");
-          return; 
+      // Main app code
+      const TodoApp = {
+        // App state
+        todos: [],
+        
+        // DOM elements
+        elements: {
+          taskInput: document.getElementById("taskInput"),
+          addButton: document.getElementById("addButton"),
+          taskList: document.getElementById("taskList")
+        },
+        
+        // Initialize the app
+        init() {
+          // Set up event listeners
+          this.elements.addButton.addEventListener("click", () => this.addTodo());
+          this.elements.taskInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") this.addTodo();
+          });
+          
+          // Load saved todos
+          this.loadTodos();
+          
+          // Render initial state
+          this.render();
+        },
+        
+        // Add a new todo
+        addTodo() {
+          const taskText = this.elements.taskInput.value.trim();
+          
+          if (!taskText) {
+            alert("Please enter a task!");
+            return;
+          }
+          
+          // Create new todo object
+          const newTodo = {
+            id: Date.now(),
+            title: taskText,
+            done: false,
+            createdAt: new Date()
+          };
+          
+          // Add to todos array
+          this.todos.push(newTodo);
+          
+          // Clear input
+          this.elements.taskInput.value = "";
+          this.elements.taskInput.focus();
+          
+          // Save and render
+          this.saveTodos();
+          this.render();
+        },
+        
+        // Delete a todo
+        deleteTodo(id) {
+          this.todos = this.todos.filter(todo => todo.id !== id);
+          this.saveTodos();
+          this.render();
+        },
+        
+        // Toggle todo completion status
+        toggleTodo(id) {
+          this.todos = this.todos.map(todo => {
+            if (todo.id === id) {
+              return { ...todo, done: !todo.done };
+            }
+            return todo;
+          });
+          
+          this.saveTodos();
+          this.render();
+        },
+        
+        // Create a task element
+        createTaskElement(todo) {
+          const taskItem = document.createElement("div");
+          taskItem.className = `task-item ${todo.done ? "done" : ""} new-task`;
+          taskItem.setAttribute("data-id", todo.id);
+          
+          // Create task name element
+          const taskName = document.createElement("div");
+          taskName.className = "task-name";
+          
+          const taskTitle = document.createElement("h3");
+          taskTitle.textContent = todo.title;
+          taskName.appendChild(taskTitle);
+          
+          // Create actions container
+          const actions = document.createElement("div");
+          actions.className = "actions";
+          
+          // Create toggle button
+          const toggleButton = document.createElement("img");
+          toggleButton.src = todo.done ? "check-double-svgrepo-com.svg" : "check-svgrepo-com.svg";
+          toggleButton.alt = todo.done ? "Mark Incomplete" : "Mark Complete";
+          toggleButton.className = "icon-button";
+          toggleButton.addEventListener("click", () => this.toggleTodo(todo.id));
+          
+          // Create delete button
+          const deleteButton = document.createElement("img");
+          deleteButton.src = "delete-svgrepo-com.svg";
+          deleteButton.alt = "Delete";
+          deleteButton.className = "icon-button";
+          deleteButton.addEventListener("click", () => this.deleteTodo(todo.id));
+          
+          // Assemble the task item
+          actions.appendChild(toggleButton);
+          actions.appendChild(deleteButton);
+          
+          taskItem.appendChild(taskName);
+          taskItem.appendChild(actions);
+          
+          return taskItem;
+        },
+        
+        // Render todos to the DOM
+        render() {
+          // Clear current list
+          this.elements.taskList.innerHTML = "";
+          
+          // Show empty state if no todos
+          if (this.todos.length === 0) {
+            const emptyState = document.createElement("div");
+            emptyState.className = "empty-state";
+            emptyState.textContent = "No tasks yet. Add one above!";
+            this.elements.taskList.appendChild(emptyState);
+            return;
+          }
+          
+          // Sort todos (completed at bottom)
+          const sortedTodos = [...this.todos].sort((a, b) => {
+            // First by completion status
+            if (a.done !== b.done) return a.done ? 1 : -1;
+            // Then by creation date (newest first for active, oldest first for completed)
+            return a.done 
+              ? new Date(a.createdAt) - new Date(b.createdAt)
+              : new Date(b.createdAt) - new Date(a.createdAt);
+          });
+          
+          sortedTodos.forEach(todo => {
+            const taskElement = this.createTaskElement(todo);
+            this.elements.taskList.appendChild(taskElement);
+          });
+        },
+        
+        saveTodos() {
+          localStorage.setItem("todos", JSON.stringify(this.todos));
+        },
+        
+        loadTodos() {
+          const savedTodos = localStorage.getItem("todos");
+          if (savedTodos) {
+            try {
+              this.todos = JSON.parse(savedTodos);
+            } catch (e) {
+              console.error("Error loading todos:", e);
+              this.todos = [];
+            }
+          }
         }
-        todos.push({
-          title: document.getElementById("taskInput").value,
-          id: Date.now(),
-        });
-        render();
-        document.getElementById("taskInput").value = "";
-      }
-
-      function Component(todo) {
-        const div = document.createElement("div");
-        div.className = "task-item";
-        div.setAttribute("data-id", todo.id);
-
-        // Task name in a separate div
-        const taskNameDiv = document.createElement("div");
-        taskNameDiv.className = "task-name";
-        const h1 = document.createElement("h1");
-        h1.innerHTML = todo.title;
-        taskNameDiv.appendChild(h1);
-
-        const actionsDiv = document.createElement("div");
-        actionsDiv.className = "actions";
-
-        const deleteIcon = document.createElement("img");
-        deleteIcon.src = "delete-svgrepo-com.svg";
-        deleteIcon.alt = "Delete";
-        deleteIcon.id = "delimg";
-        deleteIcon.className = "delete-icon";
-        deleteIcon.addEventListener("click", () => deleteTodo(todo.id));
-
-        const markDoneIcon = document.createElement("img");
-        markDoneIcon.src = "check-svgrepo-com.svg";
-        markDoneIcon.alt = "Mark as Done";
-        markDoneIcon.className = "mark-done-icon";
-        markDoneIcon.addEventListener("click", () =>
-          markAsDone(todo.id, markDoneIcon)
-        );
-
-        actionsDiv.appendChild(markDoneIcon);
-        actionsDiv.appendChild(deleteIcon);
-
-        div.appendChild(taskNameDiv);
-        div.appendChild(actionsDiv);
-
-        return div;
-      }
-
-      function deleteTodo(id) {
-        todos = todos.filter((todo) => todo.id !== id);
-        render();
-      }
-      function markAsDone(id, markDoneIcon) {
-        const taskElement = document.querySelector(`[data-id='${id}']`);
-        if (!taskElement) return;
-        if (markDoneIcon.src.includes("check-svgrepo-com.svg")) {
-          markDoneIcon.src = "check-double-svgrepo-com.svg";
-          taskElement.classList.add("done");
-        } else {
-          markDoneIcon.src = "check-svgrepo-com.svg";
-          taskElement.classList.remove("done");
-        }
-      }
-      function render() {
-        document.querySelector("#taskList").innerHTML = "";
-        for (let i = 0; i < todos.length; i++) {
-          const element = Component(todos[i]);
-          document.querySelector("#taskList").appendChild(element);
-        }
-      }
+      };
+      
+      document.addEventListener("DOMContentLoaded", () => {
+        TodoApp.init();
+      });
     </script>
   </body>
 </html>
